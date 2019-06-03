@@ -1,0 +1,4 @@
+{
+  "mongoDbUri" : "mongodb://testing1:testing2@ds263146.mlab.com:63146/sample-app-1",
+  "jwtPrivateKey": "dj>35gjeuahn.,.342(IH"
+}
