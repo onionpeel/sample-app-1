@@ -49,14 +49,31 @@ router.get(
       //Send array of the user's posts to the client
       res.json(userPosts);
     }catch(err) {
-      console.log(err);
       res.status(500).send('Server error');
     };
   }
 );
 
-//@route         GET /api/posts
+//@route         GET /api/posts/:id
 //@description   Retrieves a post by ID for specified user
 //@access        Private
+router.get(
+  '/:id',
+  authenticate,
+  async (req, res) => {
+    //Store user ID and post ID in variables
+    const postId = req.params.id;
+    const userId = req.user.id;
+    try{
+      //Retrieve from Post collection the post that matches post ID and user ID
+      const post = await Post.find({_id: postId, user: userId});
+      //Send post to the client
+      res.json(post);
+    }catch(err) {
+      res.status(500).send('Server error');
+    };
+  }
+);
+
 
 module.exports = router;
