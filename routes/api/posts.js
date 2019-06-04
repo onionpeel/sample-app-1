@@ -67,6 +67,9 @@ router.get(
     try{
       //Retrieve from Post collection the post that matches post ID and user ID
       const post = await Post.find({_id: postId, user: userId});
+      if(!post) {
+        return res.status(404).json({message: 'Post not found'});
+      };
       //Send post to the client
       res.json(post);
     }catch(err) {
@@ -75,5 +78,52 @@ router.get(
   }
 );
 
+//@route        DELETE api/users/:id
+//@description  Delete the specified post for a user
+//@access       Private
+router.delete(
+  '/:id',
+  authenticate,
+  async (req, res) => {
+    //Store user ID and post ID in variables
+    const postId = req.params.id;
+    const userId = req.user.id;
+    try{
+      //Delete from Post collection the post that matches post ID and user ID
+      const deletedPost = await Post.findOneAndDelete({_id: postId, user: userId});
+      //Send deleted post to the client
+      res.json(deletedPost);
+    }catch(err) {
+      res.status(500).send('Server error');
+    };
+  }
+);
+
+//@route        PATCH api/users/:id
+//@description  Updates the specified post
+//@access       Private
+router.patch(
+  '/:id',
+  [
+    authenticate,
+    [
+      check('text', 'A text entry is required').not().isEmpty()
+    ]
+  ],
+  async (req, res) => {
+    //Store user ID, post ID and text input in variables
+    const postId = req.params.id;
+    const userId = req.user.id;
+    const text = req.body.text;
+    try{
+      //Delete from Post collection the post that matches post ID and user ID
+      const updatedPost = await Post.findOneAndUpdate({_id: postId, user: userId}, {text}, {new: true});
+      //Send post to the client
+      res.json(updatedPost);
+    }catch(err) {
+      res.status(500).send('Server error');
+    };
+  }
+);
 
 module.exports = router;

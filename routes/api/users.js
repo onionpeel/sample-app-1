@@ -56,7 +56,6 @@ router.post(
           id: user.id
         }
       };
-      const jwtPrivateKey = config.get('jwtPrivateKey');
 
       jwt.sign(payload, config.get('jwtPrivateKey'), (err, token) => {
         if(err) {
@@ -65,6 +64,56 @@ router.post(
         res.json({token});
       });
     } catch(err) {
+      res.status(400).send(err);
+    };
+  }
+);
+
+//@route        POST api/users/login
+//@description  User login
+//@access       Public
+router.post(
+  '/login',
+  [
+    check('email', 'Email is required').isEmail(),
+    check('password', 'Password is required').exists()
+  ],
+  async (req, res) => {
+    //Find the validation errors in the request
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+      return res.status(422).json({errors: errors.array() });
+    };
+
+    //Deconstruct properties from client request
+    let {email, password} = req.body;
+
+    try{
+      //Retrieve the user from the DB
+      const user = await User.findOne({email});
+      if(!user) {
+        return res.status(400).json({errors: [{message: 'Invalid credentials'}]});
+      };
+
+      //Verify the password
+      const match = await bcrypt.compare(password, user.password);
+      if(!match) {
+        return res.status(400).json({errors: [{message: 'Invalid credentials'}]});
+      };
+
+      const payload = {
+        user: {
+          id: user.id
+        }
+      };
+
+      jwt.sign(payload, config.get('jwtPrivateKey'), (err, token) => {
+        if(err) {
+          throw err;
+        };
+        res.json({token});
+      });
+    }catch(err) {
       res.status(400).send(err);
     };
   }
