@@ -6,6 +6,23 @@ const authenticate = require('../../middleware/authenticate');
 
 const router = express.Router();
 
+//THIS IS FOR DEVELOPMENT ONLY
+//@route         GET /api/posts
+//@description   Retrieves all posts from DB
+//@access        Public
+router.get(
+  '/all',
+  async (req, res) => {
+    try {
+      const posts = await Post.find();
+      res.status(200).json(posts);
+    }catch(err) {
+      console.log(err);
+      res.status(400).send(err);
+    };
+  }
+);
+
 //@route         POST /api/posts
 //@description   Create a post
 //@access        Private
