@@ -14,22 +14,23 @@ class IdeasList extends Component {
     this.props.deleteIdea(id);
   }
 
+
   render() {
     const {ideas} = this.props.idea;
     return (
       <Container>
         <ListGroup>
           <TransitionGroup className="ideas-list">
-            {ideas.map(({id, title}) => (
-              <CSSTransition key={id} timeout={500} classNames="fade">
+            {ideas.map(({_id, text}) => (
+              <CSSTransition key={_id} timeout={500} classNames="fade">
                 <ListGroupItem>
                   <Button
                     className="remove-btn"
                     color="danger"
                     size="sm"
-                    onClick={this.onDeleteClick.bind(this, id)}
+                    onClick={this.onDeleteClick.bind(this, _id)}
                   >&times;</Button>
-                  {title}
+                {text}
                 </ListGroupItem>
               </CSSTransition>
             ))}
