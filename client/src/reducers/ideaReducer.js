@@ -1,4 +1,3 @@
-import uuid from 'uuid';
 import {GET_IDEAS, ADD_IDEA, DELETE_IDEA, IDEAS_LOADING} from '../actions/types';
 
 const initialState = {

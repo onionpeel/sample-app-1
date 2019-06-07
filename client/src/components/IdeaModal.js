@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import Proptypes from 'prop-types';
 
 import { Button, Modal, ModalHeader, ModalBody,
-  Form, FormGroup, Label, Input} from 'reactstrap';
+  Form, Label, Input} from 'reactstrap';
 import {connect} from 'react-redux';
 import {addIdea} from '../actions/ideaActions';
+
 
 class IdeaModal extends Component {
   constructor(props) {
