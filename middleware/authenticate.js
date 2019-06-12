@@ -3,7 +3,7 @@ const config = require('config');
 
 const authenticate = (req, res, next) => {
   //Get token from header
-  let token = req.header('x-auth');
+  let token = req.header('x-auth-token');
   //Check if token exists
   if(!token) {
     return res.status(401).json({message: 'No token exists, access denied'});

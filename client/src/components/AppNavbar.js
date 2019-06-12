@@ -12,6 +12,7 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem} from 'reactstrap';
+import RegisterModal from './auth/RegisterModal';
 
 class AppNavbar extends Component {
   constructor(props) {
@@ -40,7 +41,7 @@ class AppNavbar extends Component {
                   <NavLink href="https://github.com/onionpeel/sample-app-1">Project</NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink href="https://github.com/reactstrap/reactstrap">GitHub</NavLink>
+                  <RegisterModal />
                 </NavItem>
                 <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret>

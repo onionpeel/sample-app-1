@@ -1,5 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const {check, validationResult} = require('express-validator/check');
@@ -14,8 +14,8 @@ const router = express.Router();
 router.post(
   '/',
   [
+    check('name', 'User name is required').isLength({min: 1}),
     check('email', 'Email is required').isEmail(),
-    check('name', 'User name is required').exists(),
     check('password', 'Password must be at least 6 characters').isLength({min: 6})
   ],
   async (req, res) => {
@@ -34,11 +34,12 @@ router.post(
       if(user) {
         return res
         .status(400)
-        .json({errors: [{message: "A user with that email already exists"}]});
+        .json({errors: [{msg: "A user with that email already exists"}]});
       };
 
       //Encrypt password
-      password = await bcrypt.hash(password, 11);
+      const salt = await bcrypt.genSalt(11);
+      password = await bcrypt.hash(password, salt);
 
       //Create user instance
       user = new User({
@@ -57,66 +58,14 @@ router.post(
         }
       };
 
-      jwt.sign(payload, config.get('jwtPrivateKey'), (err, token) => {
-        if(err) {
-          throw err;
-        };
-        res.json({token});
-      });
+      const token = await jwt.sign(payload, config.get('jwtPrivateKey'));
+      res.json({token});
+
     } catch(err) {
       res.status(400).send(err);
     };
   }
 );
 
-//@route        POST api/users/login
-//@description  User login
-//@access       Public
-router.post(
-  '/login',
-  [
-    check('email', 'Email is required').isEmail(),
-    check('password', 'Password is required').exists()
-  ],
-  async (req, res) => {
-    //Find the validation errors in the request
-    const errors = validationResult(req);
-    if(!errors.isEmpty()) {
-      return res.status(422).json({errors: errors.array() });
-    };
-
-    //Deconstruct properties from client request
-    let {email, password} = req.body;
-
-    try{
-      //Retrieve the user from the DB
-      const user = await User.findOne({email});
-      if(!user) {
-        return res.status(400).json({errors: [{message: 'Invalid credentials'}]});
-      };
-
-      //Verify the password
-      const match = await bcrypt.compare(password, user.password);
-      if(!match) {
-        return res.status(400).json({errors: [{message: 'Invalid credentials'}]});
-      };
-
-      const payload = {
-        user: {
-          id: user.id
-        }
-      };
-
-      jwt.sign(payload, config.get('jwtPrivateKey'), (err, token) => {
-        if(err) {
-          throw err;
-        };
-        res.json({token});
-      });
-    }catch(err) {
-      res.status(400).send(err);
-    };
-  }
-);
 
 module.exports = router;

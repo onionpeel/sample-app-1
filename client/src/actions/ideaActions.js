@@ -1,17 +1,18 @@
 import axios from 'axios';
 import {GET_IDEAS, ADD_IDEA, DELETE_IDEA, IDEAS_LOADING} from './types';
+import {returnErrors} from './errorActions';
 
 export const getIdeas = () => async dispatch => {
   dispatch(setIdeasLoading());
 
   try{
-    const res = await axios.get('/api/posts/all');
+    const res = await axios.get('/api/posts');
     dispatch({
       type: GET_IDEAS,
       payload: res.data
     });
   }catch(err) {
-    console.log(err);
+    dispatch(returnErrors(err.response.data, err.response.status))
   };
 };
 
@@ -35,7 +36,7 @@ export const addIdea = idea => async dispatch => {
       payload: res.data
     });
   }catch(err) {
-    console.log(err);
+    dispatch(returnErrors(err.response.data, err.response.status))
   };
 };
 
