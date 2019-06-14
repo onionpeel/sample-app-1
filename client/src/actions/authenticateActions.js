@@ -38,7 +38,6 @@ export const register = ({name, email, password}) => async dispatch => {
       'Content-Type': 'application/json'
     }
   }
-
   //Request body
   const body = JSON.stringify({name, email, password});
 
@@ -55,14 +54,45 @@ export const register = ({name, email, password}) => async dispatch => {
 
     dispatch(returnErrors(error.response.data, error.response.status, REGISTER_FAIL));
   };
+};
 
+//Login user
+export const login = ({email, password}) => async dispatch => {
+  //Headers
+  const config = {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+  //Request body
+  const body = JSON.stringify({email, password});
+
+  try{
+    let res = await axios.post('api/authenticate', body, config);
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: res.data
+    });
+  }catch(error) {
+    dispatch({
+      type: LOGIN_FAIL
+    });
+
+    dispatch(returnErrors(error.response.data, error.response.status, LOGIN_FAIL));
+  };
+};
+
+//Logout user
+export const logout = () => {
+  return {
+    type: LOGOUT_SUCCESS
+  };
 };
 
 //Setup config/headers and token
 export const tokenConfig = getState => {
   //Get token from localStorage
   const token = getState().authenticate.token;
-
   //Headers
   const config = {
     headers: {
@@ -74,6 +104,5 @@ export const tokenConfig = getState => {
   if(token) {
     config.headers['x-auth-token'] = token;
   };
-
   return config;
 };

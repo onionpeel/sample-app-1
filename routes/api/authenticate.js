@@ -16,7 +16,7 @@ router.post(
   '/',
   [
     check('email', 'Email is required').isEmail(),
-    check('password', 'Password is required').exists()
+    check('password', 'Password is required').isLength({min: 6})
   ],
   async (req, res) => {
     //Find the validation errors in the request
@@ -49,7 +49,7 @@ router.post(
       };
 
       const token = await jwt.sign(payload, config.get('jwtPrivateKey'));
-      res.json({token});
+      res.json({token, user});
 
     }catch(err) {
       res.status(400).send(err);
@@ -66,7 +66,7 @@ router.get(
   async (req, res) => {
   try{
     const user = await User.findById(req.user.id).select('-password');
-    res.send(user);
+    res.json(user);
   }catch(err) {
     res.status(400).json({message: 'User not found'})
   };

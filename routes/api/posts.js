@@ -10,20 +10,20 @@ const router = express.Router();
 //@route         GET /api/posts
 //@description   Retrieves all posts from DB
 //@access        Public
-// router.get(
-//   '/all',
-//   async (req, res) => {
-//     try {
-//       const posts = await Post.find()
-//         .populate({path: 'user', select: '-password'})
-//         .sort({date: -1});
-//       res.status(200).json(posts);
-//     }catch(err) {
-//       console.log(err);
-//       res.status(400).send(err);
-//     };
-//   }
-// );
+router.get(
+  '/',
+  async (req, res) => {
+    try {
+      const posts = await Post.find()
+        .populate({path: 'user', select: '-password'})
+        .sort({date: -1});
+      res.status(200).json(posts);
+    }catch(err) {
+      console.log(err);
+      res.status(400).json({message: "There is an error trying to retrieve all posts"});
+    };
+  }
+);
 
 //THIS IS FOR DEVELOPMENT ONLY
 //@route         POST /api/posts
@@ -58,10 +58,16 @@ router.post(
   [
   authenticate,
     [
-      check('text', 'A text entry is required').not().isEmpty()
+      check('text', 'An entry is required').isLength({min: 1})
     ]
   ],
   async (req, res) => {
+    //Find the validation errors in the request
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+      return res.status(422).json({errors: errors.array() });
+    };
+
     try {
       //Create post
       let post = new Post({
@@ -72,8 +78,7 @@ router.post(
       let newPost = await post.save();
       res.json(newPost);
     }catch(err) {
-      console.error(error.message);
-      res.status(500).send('Server error');
+      res.status(500).json({message: "There was an error attempting to post this item"});
     };
   }
 );
@@ -81,23 +86,23 @@ router.post(
 //@route         GET /api/posts
 //@description   Retrieves all posts for specified user
 //@access        Private
-router.get(
-  '/',
-  authenticate,
-  async (req, res) => {
-    //String of user ID
-    let userId = req.user.id;
-    try {
-      //Retrieve all posts for a user by userId
-      let userPosts = await Post.find({user: userId})
-        .populate({path: 'user', select: '-password'});
-      //Send array of the user's posts to the client
-      res.json(userPosts);
-    }catch(err) {
-      res.status(500).send('Server error');
-    };
-  }
-);
+// router.get(
+//   '/',
+//   authenticate,
+//   async (req, res) => {
+//     //String of user ID
+//     let userId = req.user.id;
+//     try {
+//       //Retrieve all posts for a user by userId
+//       let userPosts = await Post.find({user: userId})
+//         .populate({path: 'user', select: '-password'});
+//       //Send array of the user's posts to the client
+//       res.json(userPosts);
+//     }catch(err) {
+//       res.status(500).send('Server error');
+//     };
+//   }
+// );
 
 //@route         GET /api/posts/:id
 //@description   Retrieves a post by ID for specified user
@@ -160,7 +165,7 @@ router.delete(
       //Send deleted post to the client
       res.json(deletedPost);
     }catch(err) {
-      res.status(500).send('Server error');
+      res.status(400).json({message: 'There was an error in attempting to delete this post'});
     };
   }
 );

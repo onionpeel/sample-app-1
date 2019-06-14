@@ -50,7 +50,6 @@ router.post(
 
       //Save user to database
       user = await user.save();
-
       //Create token and send the token to client
       const payload = {
         user: {
@@ -59,10 +58,10 @@ router.post(
       };
 
       const token = await jwt.sign(payload, config.get('jwtPrivateKey'));
-      res.json({token});
+      res.json({token, user});
 
     } catch(err) {
-      res.status(400).send(err);
+      res.status(400).send({errors: [{msg: "A server error has occurred"}]});
     };
   }
 );

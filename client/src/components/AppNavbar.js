@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {
   Collapse,
   Container,
@@ -7,12 +7,12 @@ import {
   NavbarBrand,
   Nav,
   NavItem,
-  NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem} from 'reactstrap';
+  NavLink} from 'reactstrap';
 import RegisterModal from './auth/RegisterModal';
+import Logout from './auth/Logout';
+import LoginModal from './auth/LoginModal';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 
 class AppNavbar extends Component {
   constructor(props) {
@@ -23,12 +23,51 @@ class AppNavbar extends Component {
       isOpen: false
     };
   }
+
+  static propTypes = {
+    authenticate: PropTypes.object.isRequired
+  }
+
   toggle() {
     this.setState({
       isOpen: !this.state.isOpen
     });
   }
+
+
   render() {
+    const {isAuthenticated, user} = this.props.authenticate;
+
+    const authLinks = (
+      <Fragment>
+        <NavItem>
+          <span className="navbar-text mr-3">
+            <strong>{user ? `Welcome ${user.name}` : ""}</strong>
+          </span>
+        </NavItem>
+        <NavItem>
+          <NavLink href="https://github.com/onionpeel/sample-app-1">Project</NavLink>
+        </NavItem>
+        <NavItem>
+          <Logout />
+        </NavItem>
+      </Fragment>
+    );
+
+    const guestLinks = (
+      <Fragment>
+        <NavItem>
+          <NavLink href="https://github.com/onionpeel/sample-app-1">Project</NavLink>
+        </NavItem>
+        <NavItem>
+          <RegisterModal />
+        </NavItem>
+        <NavItem>
+          <LoginModal />
+        </NavItem>
+      </Fragment>
+    );
+
     return (
       <div>
         <Navbar color="dark" dark expand="sm" className="mb-5">
@@ -37,29 +76,7 @@ class AppNavbar extends Component {
             <NavbarToggler onClick={this.toggle} />
             <Collapse isOpen={this.state.isOpen} navbar>
               <Nav className="ml-auto" navbar>
-                <NavItem>
-                  <NavLink href="https://github.com/onionpeel/sample-app-1">Project</NavLink>
-                </NavItem>
-                <NavItem>
-                  <RegisterModal />
-                </NavItem>
-                <UncontrolledDropdown nav inNavbar>
-                  <DropdownToggle nav caret>
-                    Options
-                  </DropdownToggle>
-                  <DropdownMenu right>
-                    <DropdownItem>
-                      Option 1
-                    </DropdownItem>
-                    <DropdownItem>
-                      Option 2
-                    </DropdownItem>
-                    <DropdownItem divider />
-                    <DropdownItem>
-                      Reset
-                    </DropdownItem>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
+                {isAuthenticated ? authLinks: guestLinks}
               </Nav>
             </Collapse>
           </Container>
@@ -69,4 +86,8 @@ class AppNavbar extends Component {
   }
 }
 
-export default AppNavbar;
+const mapStateToProps = state => ({
+  authenticate: state.authenticate
+});
+
+export default connect(mapStateToProps, null)(AppNavbar);

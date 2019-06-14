@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Proptypes from 'prop-types';
 
 import { Button, Modal, ModalHeader, ModalBody,
-  Form, Label, Input} from 'reactstrap';
+  Form, Label, Input, Alert} from 'reactstrap';
 import {connect} from 'react-redux';
 import {addIdea} from '../actions/ideaActions';
 
@@ -12,11 +12,38 @@ class IdeaModal extends Component {
     super(props);
     this.state = {
       modal: false,
-      text: ''
+      text: '',
+      message: null
     };
 
     this.toggle = this.toggle.bind(this);
   }
+
+
+  componentDidUpdate(prevProps) {
+    const {error, isAuthenticated} = this.props;
+    if(error !== prevProps.error) {
+      //check for register error
+      if(error.id === 'ADDITEM_FAIL') {
+        this.setState({message: error.message.errors[0].msg})
+      } else {
+        this.setState({message: null});
+      }
+    }
+    //If authenticated, close modal
+    if(this.state.modal) {
+      if(isAuthenticated) {
+        this.toggle();
+      }
+    }
+  }
+
+
+
+
+
+
+
 
   toggle() {
     this.setState(prevState => ({
@@ -38,7 +65,11 @@ class IdeaModal extends Component {
 
     this.props.addIdea(newIdea);
 
-    this.toggle();
+    this.setState({
+      text: ''
+    });
+
+    // this.toggle();
   }
 
   render() {
@@ -52,6 +83,7 @@ class IdeaModal extends Component {
         <Modal isOpen={this.state.modal} toggle={this.toggle}>
           <ModalHeader toggle={this.toggle}>Add to Ideas List</ModalHeader>
           <ModalBody>
+            {this.state.message ? <Alert color="danger">{this.state.message}</Alert> : null}
             <Form onSubmit={this.onSubmit}>
               <Label for="idea">Idea</Label>
               <Input
@@ -75,11 +107,13 @@ class IdeaModal extends Component {
 }
 
 IdeaModal.propTypes = {
-  addIdea: Proptypes.func.isRequired
+  addIdea: Proptypes.func.isRequired,
+  error: Proptypes.object.isRequired
 };
 
-const mapPropToState = state => ({
-  idea: state.idea
+const mapStateToProps = state => ({
+  idea: state.idea,
+  error: state.error
 });
 
-export default connect(mapPropToState, {addIdea})(IdeaModal);
+export default connect(mapStateToProps, {addIdea})(IdeaModal);

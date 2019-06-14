@@ -4,11 +4,6 @@ const path = require('path');
 
 const app = express();
 
-//Use this for production.  The 'or' || operator does not work properly in development
-// const port = process.env.PORT;
-//Use this for development
-const port = 5000;
-
 connectDb();
 
 app.use(express.json({extended: false}));
@@ -24,6 +19,8 @@ if (process.env.NODE_ENV === 'production') {
   });
 };
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
