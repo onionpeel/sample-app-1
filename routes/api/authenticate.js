@@ -30,13 +30,13 @@ router.post(
 
     try{
       //Retrieve the user from the DB
-      const user = await User.findOne({email});
-      if(!user) {
+      const existingUser = await User.findOne({email});
+      if(!existingUser) {
         return res.status(400).json({errors: [{message: 'User does not exist'}]});
       };
 
       //Verify the password
-      const match = await bcrypt.compare(password, user.password);
+      const match = await bcrypt.compare(password, existingUser.password);
       if(!match) {
         return res.status(400).json({errors: [{message: 'Invalid credentials'}]});
       };
@@ -44,11 +44,12 @@ router.post(
       //Create token and send the token to client
       const payload = {
         user: {
-          id: user.id
+          id: existingUser.id
         }
       };
 
       const token = await jwt.sign(payload, config.get('jwtPrivateKey'));
+      const user = await User.findById(existingUser.id).select('-password');
       res.json({token, user});
 
     }catch(err) {
@@ -65,8 +66,7 @@ router.get(
   authenticate,
   async (req, res) => {
     try{
-      const user = await User.findById(req.user.id).select('-password');
-      console.log(user)
+      let user = await User.findById(req.user.id).select('-password');
       res.json(user);
     }catch(err) {
       res.status(400).json({message: 'User not found'})

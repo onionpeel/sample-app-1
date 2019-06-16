@@ -30,8 +30,8 @@ router.post(
 
     try {
       //Check if user already exists in database
-      let user = await User.findOne({email});
-      if(user) {
+      let existingUser = await User.findOne({email});
+      if(existingUser) {
         return res
         .status(400)
         .json({errors: [{msg: "A user with that email already exists"}]});
@@ -42,22 +42,23 @@ router.post(
       password = await bcrypt.hash(password, salt);
 
       //Create user instance
-      user = new User({
+      let newUser = new User({
         name,
         email,
         password
       });
 
       //Save user to database
-      user = await user.save();
+      savedUser = await newUser.save();
       //Create token and send the token to client
       const payload = {
         user: {
-          id: user.id
+          id: savedUser.id
         }
       };
 
       const token = await jwt.sign(payload, config.get('jwtPrivateKey'));
+      const user = await User.findById(savedUser.id).select('-password');
       res.json({token, user});
 
     } catch(err) {

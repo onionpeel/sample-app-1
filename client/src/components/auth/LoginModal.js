@@ -32,7 +32,7 @@ class LoginModal extends Component {
     if(error !== prevProps.error) {
       //check for register error
       if(error.id === 'LOGIN_FAIL') {
-        this.setState({message: error.message.errors[0].msg})
+        this.setState({message: error.message.errors[0].msg});
       } else {
         this.setState({message: null});
       }
