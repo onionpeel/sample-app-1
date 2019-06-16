@@ -4,8 +4,8 @@ import Proptypes from 'prop-types';
 import { Button, Modal, ModalHeader, ModalBody,
   Form, Label, Input, Alert} from 'reactstrap';
 import {connect} from 'react-redux';
-import {addIdea} from '../actions/ideaActions';
-
+import {addIdea, clearIsAddedIdea} from '../actions/ideaActions';
+import {clearErrors} from '../actions/errorActions';
 
 class IdeaModal extends Component {
   constructor(props) {
@@ -19,36 +19,33 @@ class IdeaModal extends Component {
     this.toggle = this.toggle.bind(this);
   }
 
-
   componentDidUpdate(prevProps) {
-    const {error, isAuthenticated} = this.props;
+    const {error, isAdded} = this.props;
     if(error !== prevProps.error) {
-      //check for register error
+      //check for input error
       if(error.id === 'ADDITEM_FAIL') {
         this.setState({message: error.message.errors[0].msg})
       } else {
         this.setState({message: null});
       }
     }
-    //If authenticated, close modal
+
     if(this.state.modal) {
-      if(isAuthenticated) {
+      if(isAdded) {
         this.toggle();
       }
     }
   }
 
-
-
-
-
-
-
-
   toggle() {
+    this.props.clearErrors();
+    this.props.clearIsAddedIdea();
     this.setState(prevState => ({
       modal: !prevState.modal
     }));
+    this.setState({
+      text: ''
+    });
   }
 
   onChange = (e) => {
@@ -64,22 +61,19 @@ class IdeaModal extends Component {
     }
 
     this.props.addIdea(newIdea);
-
-    this.setState({
-      text: ''
-    });
-
-    // this.toggle();
   }
 
   render() {
     return (
       <div>
-        <Button
+        {this.props.isAuthenticated && <Button
           color="dark"
           style={{marginBottom: '2rem'}}
           onClick={this.toggle}
-          >Add idea</Button>
+          >
+            Add idea
+          </Button>}
+
         <Modal isOpen={this.state.modal} toggle={this.toggle}>
           <ModalHeader toggle={this.toggle}>Add to Ideas List</ModalHeader>
           <ModalBody>
@@ -107,13 +101,18 @@ class IdeaModal extends Component {
 }
 
 IdeaModal.propTypes = {
+  clearIsAddedIdea: Proptypes.func.isRequired,
+  isAdded: Proptypes.bool,
   addIdea: Proptypes.func.isRequired,
-  error: Proptypes.object.isRequired
+  error: Proptypes.object.isRequired,
+  clearErrors: Proptypes.func.isRequired,
+  isAuthenticated: Proptypes.bool
 };
 
 const mapStateToProps = state => ({
-  idea: state.idea,
-  error: state.error
+  isAdded: state.idea.isAdded,
+  error: state.error,
+  isAuthenticated: state.authenticate.isAuthenticated
 });
 
-export default connect(mapStateToProps, {addIdea})(IdeaModal);
+export default connect(mapStateToProps, {addIdea, clearIsAddedIdea, clearErrors})(IdeaModal);

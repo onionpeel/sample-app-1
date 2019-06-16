@@ -58,18 +58,19 @@ router.post(
 );
 
 //@Route        GET api/authenticate/user
-//@Description  Returns user database
+//@Description  Returns user from database
 //@Access       Private
 router.get(
   '/user',
   authenticate,
   async (req, res) => {
-  try{
-    const user = await User.findById(req.user.id).select('-password');
-    res.json(user);
-  }catch(err) {
-    res.status(400).json({message: 'User not found'})
-  };
+    try{
+      const user = await User.findById(req.user.id).select('-password');
+      console.log(user)
+      res.json(user);
+    }catch(err) {
+      res.status(400).json({message: 'User not found'})
+    };
 });
 
 module.exports = router;

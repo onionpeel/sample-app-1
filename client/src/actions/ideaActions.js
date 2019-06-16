@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {GET_IDEAS, ADD_IDEA, DELETE_IDEA, IDEAS_LOADING, ADDITEM_FAIL} from './types';
+import {GET_IDEAS, ADD_IDEA, DELETE_IDEA, IDEAS_LOADING, ADDITEM_FAIL, CLEAR_ADDED} from './types';
 import {returnErrors} from './errorActions';
 import {tokenConfig} from './authenticateActions';
 
@@ -44,5 +44,11 @@ export const addIdea = idea => async (dispatch, getState) => {
 export const setIdeasLoading = () => {
   return {
     type: IDEAS_LOADING
+  };
+};
+
+export const clearIsAddedIdea = () => {
+  return {
+    type: CLEAR_ADDED
   };
 };

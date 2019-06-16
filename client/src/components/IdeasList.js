@@ -6,6 +6,12 @@ import {getIdeas, deleteIdea} from '../actions/ideaActions';
 import Proptypes from 'prop-types';
 
 class IdeasList extends Component {
+  static propTypes = {
+    getIdeas: Proptypes.func.isRequired,
+    idea: Proptypes.object.isRequired,
+    isAuthenticated: Proptypes.bool
+  };
+
   componentDidMount() {
     this.props.getIdeas();
   }
@@ -24,12 +30,14 @@ class IdeasList extends Component {
             {ideas.map(({_id, text}) => (
               <CSSTransition key={_id} timeout={500} classNames="fade">
                 <ListGroupItem>
-                  <Button
+                  {this.props.isAuthenticated && <Button
                     className="remove-btn"
                     color="danger"
                     size="sm"
                     onClick={this.onDeleteClick.bind(this, _id)}
-                  >&times;</Button>
+                    >
+                      &times;
+                    </Button>}
                 {text}
                 </ListGroupItem>
               </CSSTransition>
@@ -41,13 +49,9 @@ class IdeasList extends Component {
   }
 }
 
-IdeasList.propTypes = {
-  getIdeas: Proptypes.func.isRequired,
-  idea: Proptypes.object.isRequired
-};
-
 const mapStateToProps = state => ({
-  idea: state.idea
+  idea: state.idea,
+  isAuthenticated: state.authenticate.isAuthenticated
 });
 
 export default connect(mapStateToProps, {getIdeas, deleteIdea})(IdeasList);

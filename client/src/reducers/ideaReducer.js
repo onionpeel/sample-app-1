@@ -1,8 +1,9 @@
-import {GET_IDEAS, ADD_IDEA, DELETE_IDEA, IDEAS_LOADING} from '../actions/types';
+import {GET_IDEAS, ADD_IDEA, DELETE_IDEA, IDEAS_LOADING, CLEAR_ADDED} from '../actions/types';
 
 const initialState = {
   ideas: [],
-  loading: false
+  loading: false,
+  isAdded: false
 };
 
 export default function(state = initialState, action) {
@@ -21,13 +22,19 @@ export default function(state = initialState, action) {
     case ADD_IDEA:
       return {
         ...state,
-        ideas: [action.payload, ...state.ideas]
+        ideas: [action.payload, ...state.ideas],
+        isAdded: true
       };
     case IDEAS_LOADING:
       return {
         ...state,
         loading: true
       };
+    case CLEAR_ADDED:
+      return {
+        ...state,
+        isAdded: false
+      }
     default:
       return state;
   };

@@ -49,6 +49,8 @@ class LoginModal extends Component {
     //Clear errors
     this.props.clearErrors();
     this.setState(prevState => ({
+      email: '',
+      password: '',
       modal: !prevState.modal
     }));
   }
@@ -71,14 +73,6 @@ class LoginModal extends Component {
 
     //Attempt to login
     this.props.login(user);
-
-    // if(this.props.isAuthenticated) {
-    //   this.setState({
-    //     email: '',
-    //     password: ''
-    //   });
-    // };
-
   };
 
   render() {

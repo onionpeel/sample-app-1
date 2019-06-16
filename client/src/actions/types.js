@@ -1,5 +1,6 @@
 export const GET_IDEAS = 'GET_IDEAS';
 export const ADD_IDEA = 'ADD_IDEA';
+export const CLEAR_ADDED = 'CLEAR_ADDED';
 export const DELETE_IDEA = 'DELETE_IDEA';
 export const IDEAS_LOADING = 'IDEAS_LOADING';
 export const USER_LOADING = 'USER_LOADING';

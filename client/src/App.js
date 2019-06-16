@@ -8,21 +8,23 @@ import './App.css';
 
 import AppNavbar from './components/AppNavbar';
 import IdeasList from './components/IdeasList';
-import IdeaModal from './components/IdeaModal';
+// import IdeaModal from './components/IdeaModal';
+import IsLoggedIn from './components/IsLoggedIn';
 import {loadUser} from './actions/authenticateActions';
 
 class App extends Component {
   componentDidMount() {
-    store.dispatch(loadUser());
+      store.dispatch(loadUser());
   }
 
-  render() {
+
+ render() {
     return (
       <Provider store={store}>
         <div className="App">
           <AppNavbar />
           <Container>
-            <IdeaModal />
+            <IsLoggedIn />
             <IdeasList />
           </Container>
         </div>
